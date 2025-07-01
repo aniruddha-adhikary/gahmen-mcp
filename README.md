@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/aniruddha-adhikary-gahmen-mcp-badge.png)](https://mseep.ai/app/aniruddha-adhikary-gahmen-mcp)
+
 # Gahmen MCP Server
 
 MCP (Model Context Protocol) server for Singapore's data.gov.sg APIs, providing easy access to government datasets and collections.
