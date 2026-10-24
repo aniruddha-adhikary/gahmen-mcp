@@ -1,11 +1,12 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import axios from 'axios';
+import { dataGovSgRateLimiter as rateLimiter } from './rateLimiter.js';
 
 // API Base URLs for data.gov.sg
-const COLLECTION_API_BASE = 'https://api-production.data.gov.sg/v2/public/api';
-const DATASET_API_BASE = 'https://api-production.data.gov.sg/v2/public/api';
-const DATASTORE_API_BASE = 'https://data.gov.sg/api/action';
+const COLLECTION_API_BASE = 'https://api-open.data.gov.sg/v2/public/api';
+const DATASET_API_BASE = 'https://api-open.data.gov.sg/v2/public/api';
+const DATASTORE_API_BASE = 'https://api-open.data.gov.sg/api/action';
 const DOWNLOAD_API_BASE = 'https://api-open.data.gov.sg/v1/public/api';
 
 export function registerDataGovSgTools(server: McpServer) {
@@ -21,6 +22,7 @@ export function registerDataGovSgTools(server: McpServer) {
         const url = `${COLLECTION_API_BASE}/collections`;
         const params = page ? { page } : {};
 
+        await rateLimiter.waitIfNeeded();
         const response = await axios.get(url, { params });
         const data = response.data;
 
@@ -67,6 +69,7 @@ export function registerDataGovSgTools(server: McpServer) {
         const url = `${COLLECTION_API_BASE}/collections/${collectionId}/metadata`;
         const params = withDatasetMetadata ? { withDatasetMetadata: true } : {};
 
+        await rateLimiter.waitIfNeeded();
         const response = await axios.get(url, { params });
         const data = response.data;
 
@@ -109,6 +112,7 @@ export function registerDataGovSgTools(server: McpServer) {
         const url = `${DATASET_API_BASE}/datasets`;
         const params = page ? { page } : {};
 
+        await rateLimiter.waitIfNeeded();
         const response = await axios.get(url, { params });
         const data = response.data;
 
@@ -148,6 +152,7 @@ export function registerDataGovSgTools(server: McpServer) {
       try {
         const url = `${DATASET_API_BASE}/datasets/${datasetId}/metadata`;
 
+        await rateLimiter.waitIfNeeded();
         const response = await axios.get(url);
         const data = response.data;
 
@@ -216,6 +221,7 @@ export function registerDataGovSgTools(server: McpServer) {
         if (q) params.q = typeof q === 'string' ? q : JSON.stringify(q);
         if (sort) params.sort = sort;
 
+        await rateLimiter.waitIfNeeded();
         const response = await axios.get(url, { params });
         const data = response.data;
 
@@ -273,6 +279,7 @@ export function registerDataGovSgTools(server: McpServer) {
         if (columnNames) body.columnNames = columnNames;
         if (filters) body.filters = filters;
 
+        await rateLimiter.waitIfNeeded();
         const response = await axios.get(url, {
           headers: { 'Content-Type': 'application/json' },
           data: body,
@@ -334,6 +341,7 @@ export function registerDataGovSgTools(server: McpServer) {
         if (columnNames) body.columnNames = columnNames;
         if (filters) body.filters = filters;
 
+        await rateLimiter.waitIfNeeded();
         const response = await axios.get(url, {
           headers: { 'Content-Type': 'application/json' },
           data: body,

@@ -1,6 +1,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
 import axios from 'axios';
+import { singStatRateLimiter as rateLimiter } from './rateLimiter.js';
 
 // API Base URL for SingStat
 const SINGSTAT_API_BASE = 'https://tablebuilder.singstat.gov.sg/api/table';
@@ -25,6 +26,7 @@ export function registerSingStatTools(server: McpServer) {
         const url = `${SINGSTAT_API_BASE}/resourceid`;
         const params = { keyword, searchOption };
 
+        await rateLimiter.waitIfNeeded();
         const response = await axios.get(url, { params });
         const data = response.data;
 
@@ -68,6 +70,7 @@ export function registerSingStatTools(server: McpServer) {
       try {
         const url = `${SINGSTAT_API_BASE}/metadata/${resourceId}`;
 
+        await rateLimiter.waitIfNeeded();
         const response = await axios.get(url);
         const data = response.data;
 
@@ -166,6 +169,7 @@ export function registerSingStatTools(server: McpServer) {
         if (between) params.between = between;
         if (search) params.search = search;
 
+        await rateLimiter.waitIfNeeded();
         const response = await axios.get(url, { params });
         const data = response.data;
 
